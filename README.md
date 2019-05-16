@@ -2,7 +2,7 @@
 High school is opening for a new semester, we are now preparing a backend web service where the students can choose from different group-projects.
 
 For the web service, there are certain rules.
-1. Create a ASP.NET MVC web service in order to be called.
+1. Create a ASP.NET __Core__ MVC web service in order to be called.
 3. One project can have multiple groups of students.
 4. Each group can only have multiple students.
 5. Each student in one project can only join one group.
