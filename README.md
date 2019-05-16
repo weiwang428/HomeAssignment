@@ -1,26 +1,32 @@
 # HomeAssignment
-High school is opening for a new semester, we are now preparing a backend webservice for the students can choose from different group-projects.
-There are certain rules for the service:
+High school is opening for a new semester, we are now preparing a backend web service where the students can choose from different group-projects.
+
+For the web service, there are certain rules.
 1. Create a ASP.NET MVC web service in order to be called.
 3. One project can have multiple groups of students.
 4. Each group can only have multiple students.
 5. Each student in one project can only join one group.
 
 You will at least have following typed information:
-1. Student:
-      a. Guid studentId
-      b. string firstName
+### Student:
+
+      a. Guid studentId	  
+      b. string firstName	  
       c. string lastName
-2. Project:
-      a. Guid projectId
+	  
+### Project:
+
+      a. Guid projectId	  
       b. string projectName
-3. Group:
-      a. Guid groupId
+	  
+### Group:
+
+      a. Guid groupId	  
       b. string groupName
 
 This web service will provide certain APIs, return in JSON format:
 
-# Student APIs:
+## Student APIs:
 
 /Student/Init  // Initialize the student data 
 
@@ -30,7 +36,7 @@ This web service will provide certain APIs, return in JSON format:
 
 
 
-# Project APIs:
+## Project APIs:
 
 /project/Init // Initialize the project data
 
@@ -54,13 +60,13 @@ Note:
 6. You can use any 3rd-party libs, EXCEPT GPL (inc. v2, v3) licensed ones.
 7. You MUST use SQLITE as the data source, the connection string and DBContext has already prepared for you in the repo.
 
-# Support
+## Support
 
-If you have any questions please be free contact us via it-hire@northmill.se.
+If you have any questions regarding the assignment, contact us at it-hire@northmill.se.
 
-# Examples:
+## Examples:
 
-Student APIs:
+### Student APIs:
 ```
 Input:
 /student/Init
@@ -84,7 +90,7 @@ Output:
 ```
 
 
-Project APIs:
+### Project APIs:
 
 ```
 Input:
