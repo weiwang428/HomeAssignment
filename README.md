@@ -56,7 +56,7 @@ Note:
 
 # Support
 
-If you have any questions please be free contact us.
+If you have any questions please be free contact us via it-hire@northmill.se.
 
 # Examples:
 
