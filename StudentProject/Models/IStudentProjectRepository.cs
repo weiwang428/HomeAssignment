@@ -16,10 +16,10 @@ namespace StudentProject.Models
 
         #region Project and Group API
 
-        //bool InitProject();
-        //IEnumerable<Project> ListProjects();
-        //bool AddStudentToGroup(Guid groupId, Guid studentId);
-        //string CreateGroup(Guid projectId, string groupName);
+        bool InitProject();
+        IEnumerable<Project> ListProjects();
+        bool AddStudentToGroup(Guid groupId, Guid studentId);
+        string CreateGroup(Guid projectId, string groupName);
 
         #endregion
     }

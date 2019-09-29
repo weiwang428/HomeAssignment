@@ -38,6 +38,14 @@ namespace StudentProject.Controllers
             return Ok(_stuProjRepo.ListStudents());
         }
 
+        [HttpGet("GetProjects")]
+        public ActionResult GetProjects(string Id)
+        {
+            return Ok(_stuProjRepo.GetProjects(new Guid(Id)));
+        }
+
+
+
 
     }
 }
