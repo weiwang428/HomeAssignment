@@ -7,6 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using StudentProject.DBContext;
 using Swashbuckle.AspNetCore.Swagger;
+using StudentProject.Models;
 
 namespace StudentProject
 {
@@ -49,6 +50,9 @@ namespace StudentProject
                     );
                 }
             );
+
+            // Added Dependence Injection Service.
+            services.AddScoped<IStudentProjectRepository, StudentProjectRepository>();
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)

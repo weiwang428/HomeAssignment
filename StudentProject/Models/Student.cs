@@ -1,6 +1,7 @@
 ﻿using System;
-using System.ComponentModel.DataAnnotations;
+using Newtonsoft.Json;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 
 namespace StudentProject.Models
@@ -20,6 +21,7 @@ namespace StudentProject.Models
         public string FirstName { get; set; }
         [Required]
         public string LastName { get; set; }
+        [JsonIgnore]
         public ICollection<StudentGroup> StudentGroups { get; }
     }
 }
