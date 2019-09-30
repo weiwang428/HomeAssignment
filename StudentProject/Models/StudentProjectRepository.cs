@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using StudentProject.DBContext;
 using System.Linq;
+using StudentProject.DBContext;
+using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
-
 
 namespace StudentProject.Models
 {
@@ -22,24 +21,25 @@ namespace StudentProject.Models
         /// <returns>True if sucess, otherwise false.</returns>
         public bool InitStudent()
         {
-            //if (ClearExistingDatabaseData())
-            //{
-            //    // Create the new student data.
-            //    Student s1 = new Student() { StudentId = Guid.NewGuid(), FirstName = "Demo", LastName = "Example" };
-            //    Student s2 = new Student() { StudentId = Guid.NewGuid(), FirstName = "Anders", LastName = "Andersson" };
-            //    Student s3 = new Student() { StudentId = Guid.NewGuid(), FirstName = "Steven", LastName = "Job" };
-            //    Student s4 = new Student() { StudentId = Guid.NewGuid(), FirstName = "Lars", LastName = "Nillson" };
-            //    _dbContext.Students.Add(s1);
-            //    _dbContext.Students.Add(s2);
-            //    _dbContext.Students.Add(s3);
-            //    _dbContext.Students.Add(s4);
-            //    _dbContext.SaveChanges();
-            //    return true;
-            //}
-            //else
-            //    return false;
-            InitializeDatabaseData();
-            return true;
+            try
+            {
+                _dbContext.Students.RemoveRange(_dbContext.Students);
+                // Create the new student data.
+                Student s1 = new Student() { StudentId = Guid.NewGuid(), FirstName = "Demo", LastName = "Example" };
+                Student s2 = new Student() { StudentId = Guid.NewGuid(), FirstName = "Anders", LastName = "Andersson" };
+                Student s3 = new Student() { StudentId = Guid.NewGuid(), FirstName = "Steven", LastName = "Job" };
+                Student s4 = new Student() { StudentId = Guid.NewGuid(), FirstName = "Lars", LastName = "Nillson" };
+                _dbContext.Students.Add(s1);
+                _dbContext.Students.Add(s2);
+                _dbContext.Students.Add(s3);
+                _dbContext.Students.Add(s4);
+                _dbContext.SaveChanges();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         /// <summary>
@@ -83,8 +83,10 @@ namespace StudentProject.Models
         /// <returns>true if success, otherwise false.</returns>
         public bool InitProject()
         {
-            if (ClearExistingDatabaseData())
+            try
             {
+                _dbContext.Groups.RemoveRange(_dbContext.Groups);
+                _dbContext.Projects.RemoveRange(_dbContext.Projects);
                 // Create the Project Data.
                 Project p1 = new Project() { ProjectId = Guid.NewGuid(), ProjectName = "English" };
                 Project p2 = new Project() { ProjectId = Guid.NewGuid(), ProjectName = "Math" };
@@ -94,8 +96,10 @@ namespace StudentProject.Models
                 _dbContext.SaveChanges();
                 return true;
             }
-            else
+            catch
+            {
                 return false;
+            }
         }
 
         /// <summary>
@@ -129,7 +133,7 @@ namespace StudentProject.Models
             }
             // Check if they are already paired.
             var result = stu.StudentGroups.Where(sg => sg.GroupID == groupId).FirstOrDefault();
-            if(result != null)
+            if (result != null)
                 return false;
 
             // Find if the group is included in a project.
@@ -169,13 +173,13 @@ namespace StudentProject.Models
                 return "Creation Fail, duplicate project name.";
             // Create a new GUID for group.
             Group newGroup = new Group() { GroupId = new Guid(), GroupName = groupName };
-            _dbContext.Groups.Add(newGroup);
+            pro.Groups.Add(newGroup);
             _dbContext.SaveChanges();
             return newGroup.GroupId.ToString();
         }
 
         /// <summary>
-        /// Clear the Database Data.
+        /// Clear the Database Data, for test.
         /// </summary>
         private bool ClearExistingDatabaseData()
         {
@@ -188,7 +192,10 @@ namespace StudentProject.Models
                 return false;
         }
 
-        public void InitializeDatabaseData()
+        /// <summary>
+        /// Initial the Database Data, for test.
+        /// </summary>
+        private void InitializeDatabaseData()
         {
             // Create the new student data.
             Student s1 = new Student() { StudentId = Guid.NewGuid(), FirstName = "Demo", LastName = "Example" };
@@ -226,13 +233,10 @@ namespace StudentProject.Models
             p2.Groups.Add(g5);
             p2.Groups.Add(g6);
 
-            // Add to the database.
+            // Add to the database, and then save the changes.
             _dbContext.Projects.Add(p1);
             _dbContext.Projects.Add(p2);
-
             _dbContext.SaveChangesAsync();
         }
-
-
     }
 }

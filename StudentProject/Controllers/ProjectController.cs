@@ -1,19 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using StudentProject.Models;
 
-
 namespace StudentProject.Controllers
 {
-    [Route("[controller]")]
+    [Route("[controller]/[action]")]
     [ApiController]
     public class ProjectController : ControllerBase
     {
-        readonly IStudentProjectRepository _stuProjRepo;
+        private readonly IStudentProjectRepository _stuProjRepo;
 
         // Dependence Injection of the constructor.
         public ProjectController(IStudentProjectRepository _stuProjRepo)
@@ -21,7 +17,7 @@ namespace StudentProject.Controllers
             this._stuProjRepo = _stuProjRepo;
         }
 
-        [HttpGet("Init")]
+        [HttpGet]
         public ContentResult Init()
         {
             bool done = _stuProjRepo.InitProject();
@@ -32,7 +28,7 @@ namespace StudentProject.Controllers
         }
 
         // GET /Project/List
-        [HttpGet("List")]
+        [HttpGet]
         [Produces("application/json")]
         public ActionResult List()
         {
@@ -40,23 +36,34 @@ namespace StudentProject.Controllers
         }
 
         // POST /project/AddStudentToGroup?groupId={Group_Id}&studentId={Student_Id}
-        [HttpPost("AddStudentToGroup")]
+        [HttpPost]
         public ContentResult AddStudentToGroup(string groupId, string studentId)
         {
-            if (_stuProjRepo.AddStudentToGroup(new Guid(groupId), new Guid(studentId)))
-                return Content("True");
-            else
-                return Content("False");
-
+            try
+            {
+                if (_stuProjRepo.AddStudentToGroup(new Guid(groupId), new Guid(studentId)))
+                    return Content("True");
+                else
+                    return Content("False");
+            }
+            catch (Exception e)
+            {
+                return Content(e.Message);
+            }
         }
 
         // POST /project/Creategroup?projectid={Project_Id}&groupname={Group_Name}
-        [HttpPost("Creategroup")]
+        [HttpPost]
         public ContentResult Creategroup(string projectid, string groupname)
         {
-            return Content(_stuProjRepo.CreateGroup(new Guid(projectid), groupname));
+            try
+            {
+                return Content(_stuProjRepo.CreateGroup(new Guid(projectid), groupname));
+            }
+            catch (Exception e)
+            {
+                return Content(e.Message);
+            }
         }
-
-
     }
 }

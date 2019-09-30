@@ -21,6 +21,6 @@ namespace StudentProject.Models
 
         // Each group may have multiple students
         [JsonProperty("Students")]
-        public ICollection<StudentGroup> StudentGroups { get;}
+        public ICollection<StudentGroup> StudentGroups { get; }
     }
 }

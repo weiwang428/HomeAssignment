@@ -1,19 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using StudentProject.Models;
 
 namespace StudentProject.Controllers
 {
-    [Route("[controller]")]
+    [Route("[controller]/[action]")]
     [ApiController]
     public class StudentController : ControllerBase
     {
         // Reference to the Database Context object.
-        readonly IStudentProjectRepository _stuProjRepo;
+        private readonly IStudentProjectRepository _stuProjRepo;
 
         // Dependence Injection of the constructor.
         public StudentController(IStudentProjectRepository _stuProjRepo)
@@ -22,7 +19,7 @@ namespace StudentProject.Controllers
         }
 
         // GET /Student/Init
-        [HttpGet("Init")]
+        [HttpGet]
         public ContentResult Init()
         {
             bool done = _stuProjRepo.InitStudent();
@@ -33,7 +30,7 @@ namespace StudentProject.Controllers
         }
 
         // GET /Student/List
-        [HttpGet("List")]
+        [HttpGet]
         [Produces("application/json")]
         public ActionResult List()
         {
@@ -41,11 +38,18 @@ namespace StudentProject.Controllers
         }
 
         // GET /Student/GetProjects?Id={Student_Id}
-        [HttpGet("GetProjects")]
+        [HttpGet]
         [Produces("application/json")]
         public ActionResult GetProjects(string Id)
         {
-            return Ok(_stuProjRepo.GetProjects(new Guid(Id)));
+            try
+            {
+                return Ok(_stuProjRepo.GetProjects(new Guid(Id)));
+            }
+            catch (Exception e)
+            {
+                return Content(e.Message);
+            }
         }
     }
 }

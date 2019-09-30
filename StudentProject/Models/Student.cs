@@ -16,7 +16,7 @@ namespace StudentProject.Models
             this.StudentGroups = new HashSet<StudentGroup>();
         }
         [Required]
-        public Guid StudentId{ get; set; }
+        public Guid StudentId { get; set; }
         [Required]
         public string FirstName { get; set; }
         [Required]
