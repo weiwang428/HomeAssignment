@@ -27,7 +27,7 @@ namespace StudentProject.Models
         {
             try
             {
-                _dbContext.Students.RemoveRange(_dbContext.Students);
+                if (_dbContext.Students.Count() > 0) _dbContext.Students.RemoveRange(_dbContext.Students);
                 // Read the initial students from the configuration file.
                 var init_student_lst = _configuration.GetSection("InitData:Students").Get<List<Student>>();
                 // Create the new student data.
@@ -61,15 +61,22 @@ namespace StudentProject.Models
             // Filter the projects by studentId, search the groups in each project, the selected project should 
             // satisfy the matching which means one of the Group in the selected project Groups should contain the 
             // Student.
-            var query_result = _dbContext.Projects.Where(p => p.Groups.Any(g => g.StudentGroups.Any(sg => sg.StudentId == studentId)))
-                .Include(p => p.Groups).ThenInclude(g => g.StudentGroups).ThenInclude(sg => sg.Student).ToList();
+            var query_result = _dbContext.Projects
+                                                  .Where(p =>
+                                                            p.Groups.Any(g =>
+                                                                            g.StudentGroups.Any(sg => sg.StudentId == studentId)
+                                                                        )
+                                                        )
+                                                  .Include(p => p.Groups)
+                                                        .ThenInclude(g => g.StudentGroups)
+                                                            .ThenInclude(sg => sg.Student).ToList();
             // Since we only need the group which has the student, so we filter the Groups in each project
             // and remap it to a anonymous class which only the group contains the student information is included.
             var format_result = query_result.Select(p => new
             {
                 ProjectId = p.ProjectId,
                 ProjectName = p.ProjectName,
-                Groups = p.Groups.SingleOrDefault(
+                Groups = p.Groups.Where(
                             g => g.StudentGroups.Any(sg => sg.StudentId == studentId)
                          )
             }).ToList();
@@ -84,8 +91,8 @@ namespace StudentProject.Models
         {
             try
             {
-                _dbContext.Groups.RemoveRange(_dbContext.Groups);
-                _dbContext.Projects.RemoveRange(_dbContext.Projects);
+                if (_dbContext.Groups.Count() > 0) _dbContext.Groups.RemoveRange(_dbContext.Groups);
+                if (_dbContext.Projects.Count() > 0) _dbContext.Projects.RemoveRange(_dbContext.Projects);
 
                 // Read the initial projects from the configuration file.
                 var init_project_lst = _configuration.GetSection("InitData:Projects").Get<List<Project>>();
@@ -106,12 +113,11 @@ namespace StudentProject.Models
         /// <returns>A collection of projects</returns>
         public IEnumerable<Project> ListProjects()
         {
-            //_dbContext.Projects.ForEachAsync(p => p.Groups.Add())
-            return _dbContext.Projects.
-                Include(p => p.Groups).
-                ThenInclude(g => g.StudentGroups).
-                ThenInclude(sg => sg.Student).
-                ToList();
+            return _dbContext.Projects
+                                    .Include(p => p.Groups)
+                                         .ThenInclude(g => g.StudentGroups)
+                                             .ThenInclude(sg => sg.Student)
+                                    .ToList();
         }
 
         /// <summary>
@@ -123,28 +129,43 @@ namespace StudentProject.Models
         public bool AddStudentToGroup(Guid groupId, Guid studentId)
         {
             // Make Sure the group and student is valid.
-            Student stu = _dbContext.Students.Include(ss => ss.StudentGroups).Where(ss => ss.StudentId == studentId).FirstOrDefault();
-            Group gro = _dbContext.Groups.Where(gg => gg.GroupId == groupId).FirstOrDefault();
+            Student stu = _dbContext.Students
+                                            .Include(s => s.StudentGroups)
+                                            .Where(s => s.StudentId == studentId)
+                                            .FirstOrDefault();
+            Group gro = _dbContext.Groups
+                                        .Where(g => g.GroupId == groupId)
+                                        .FirstOrDefault();
             if (stu == null || gro == null)
             {
                 return false;
             }
             // Check if they are already paired.
-            var result = stu.StudentGroups.Where(sg => sg.GroupID == groupId).FirstOrDefault();
-            if (result != null)
+            var result = stu.StudentGroups
+                                        .Any(sg => sg.GroupID == groupId);
+            if (result)
                 return false;
 
             // Find if the group is included in a project.
-            var proj = _dbContext.Projects.Include(pp => pp.Groups).ThenInclude(gg => gg.StudentGroups).FirstOrDefault(p => p.Groups.Contains(gro));
+            var proj = _dbContext.Projects
+                                        .Include(pp => pp.Groups)
+                                            .ThenInclude(gg => gg.StudentGroups)
+                                        .FirstOrDefault(p => p.Groups.Contains(gro));
 
-            // This group is not included in any project, then student to it.
+            // If this group is included in a project, then we need to check the other groups in 
+            // this project, none of them should have this student.
             if (proj != null)
             {
-                // Now find all the Groups
-                var find_grp = proj.Groups.FirstOrDefault(gg => gg.StudentGroups.Any(sg => sg.StudentId == stu.StudentId));
-                if (find_grp != null)
+                // Now find if other group include the student.
+                result = proj.Groups
+                                .Any(g => 
+                                        g.StudentGroups.Any(sg => sg.StudentId == studentId)
+                                    );
+                if (result)
                     return false;
             }
+
+            // Now we can safely add the student to this group.
             _dbContext.AddRange(new StudentGroup { Student = stu, Group = gro });
             _dbContext.SaveChanges();
             return true;
@@ -166,13 +187,16 @@ namespace StudentProject.Models
             if (pro == null)
                 return "Creation Fail, no such project.";
             // Make sure the group name is not used in the same project.
-            Group gro = pro.Groups.Where(g => g.GroupName == groupName).FirstOrDefault();
+            Group gro = pro.Groups
+                                .Where(g => g.GroupName == groupName)
+                                .FirstOrDefault();
             if (gro != null)
                 return "Creation Fail, duplicate project name.";
             // Create a new GUID for group.
             Group newGroup = new Group() { GroupId = new Guid(), GroupName = groupName };
             pro.Groups.Add(newGroup);
             _dbContext.SaveChanges();
+            // Return the newly created group's GUID.
             return newGroup.GroupId.ToString();
         }
 
@@ -232,7 +256,7 @@ namespace StudentProject.Models
                 InitializeDatabaseData();
                 return true;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return false;
             }
