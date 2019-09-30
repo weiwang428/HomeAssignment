@@ -9,7 +9,7 @@ namespace StudentProject.Models
 {
     public class StudentProjectRepository : IStudentProjectRepository
     {
-        private StudentProjectDbContext _dbContext;
+        private readonly StudentProjectDbContext _dbContext;
         private readonly IConfiguration _configuration;
 
         // Dependece injection of the DatabaseContext.
