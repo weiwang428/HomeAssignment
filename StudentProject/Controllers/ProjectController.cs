@@ -18,6 +18,16 @@ namespace StudentProject.Controllers
         }
 
         [HttpGet]
+        public ContentResult LoadPreparedData()
+        {
+            bool done = _stuProjRepo.LoadPreparedData();
+            if (done)
+                return Content("Successfully load the prepared data.");
+            else
+                return Content("Problem with loading prepared data.");
+        }
+
+        [HttpGet]
         public ContentResult Init()
         {
             bool done = _stuProjRepo.InitProject();

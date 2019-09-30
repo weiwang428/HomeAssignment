@@ -6,6 +6,9 @@ namespace StudentProject.Models
 {
     public interface IStudentProjectRepository
     {
+
+        bool LoadPreparedData();
+
         #region Student API
 
         bool InitStudent();

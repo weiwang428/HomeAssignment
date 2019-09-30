@@ -21,6 +21,7 @@ namespace StudentProject.Models
         public string FirstName { get; set; }
         [Required]
         public string LastName { get; set; }
+        // A reference collection for many - many relationship.
         [JsonIgnore]
         public ICollection<StudentGroup> StudentGroups { get; }
     }

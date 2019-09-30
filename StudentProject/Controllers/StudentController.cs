@@ -18,6 +18,16 @@ namespace StudentProject.Controllers
             this._stuProjRepo = _stuProjRepo;
         }
 
+        [HttpGet]
+        public ContentResult LoadPreparedData()
+        {
+            bool done = _stuProjRepo.LoadPreparedData();
+            if (done)
+                return Content("Successfully load the prepared data.");
+            else
+                return Content("Problem with loading prepared data.");
+        }
+
         // GET /Student/Init
         [HttpGet]
         public ContentResult Init()

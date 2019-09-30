@@ -19,7 +19,7 @@ namespace StudentProject.Models
         [Required]
         public string GroupName { get; set; }
 
-        // Each group may have multiple students
+        // A reference collection for many - many relationship.
         [JsonProperty("Students")]
         public ICollection<StudentGroup> StudentGroups { get; }
     }

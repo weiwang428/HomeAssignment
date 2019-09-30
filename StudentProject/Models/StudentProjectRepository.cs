@@ -3,20 +3,24 @@ using System.Linq;
 using StudentProject.DBContext;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 namespace StudentProject.Models
 {
     public class StudentProjectRepository : IStudentProjectRepository
     {
         private StudentProjectDbContext _dbContext;
+        private readonly IConfiguration _configuration;
+
         // Dependece injection of the DatabaseContext.
-        public StudentProjectRepository(StudentProjectDbContext _dbContext)
+        public StudentProjectRepository(StudentProjectDbContext _dbContext, IConfiguration _configuration)
         {
             this._dbContext = _dbContext;
+            this._configuration = _configuration;
         }
 
         /// <summary>
-        /// Initialize the Student Data, give 4 students as default data, clear the old data first.
+        /// Initialize the Student Data from the dataset in json file, clear the old data first.
         /// </summary>
         /// <returns>True if sucess, otherwise false.</returns>
         public bool InitStudent()
@@ -24,15 +28,10 @@ namespace StudentProject.Models
             try
             {
                 _dbContext.Students.RemoveRange(_dbContext.Students);
+                // Read the initial students from the configuration file.
+                var init_student_lst = _configuration.GetSection("InitData:Students").Get<List<Student>>();
                 // Create the new student data.
-                Student s1 = new Student() { StudentId = Guid.NewGuid(), FirstName = "Demo", LastName = "Example" };
-                Student s2 = new Student() { StudentId = Guid.NewGuid(), FirstName = "Anders", LastName = "Andersson" };
-                Student s3 = new Student() { StudentId = Guid.NewGuid(), FirstName = "Steven", LastName = "Job" };
-                Student s4 = new Student() { StudentId = Guid.NewGuid(), FirstName = "Lars", LastName = "Nillson" };
-                _dbContext.Students.Add(s1);
-                _dbContext.Students.Add(s2);
-                _dbContext.Students.Add(s3);
-                _dbContext.Students.Add(s4);
+                _dbContext.Students.AddRange(init_student_lst);
                 _dbContext.SaveChanges();
                 return true;
             }
@@ -78,7 +77,7 @@ namespace StudentProject.Models
         }
 
         /// <summary>
-        /// Initialize the project data, give 2 projects as the default projects.
+        /// Initialize the project data from the json file, clear the old groups and projects first.
         /// </summary>
         /// <returns>true if success, otherwise false.</returns>
         public bool InitProject()
@@ -87,12 +86,11 @@ namespace StudentProject.Models
             {
                 _dbContext.Groups.RemoveRange(_dbContext.Groups);
                 _dbContext.Projects.RemoveRange(_dbContext.Projects);
-                // Create the Project Data.
-                Project p1 = new Project() { ProjectId = Guid.NewGuid(), ProjectName = "English" };
-                Project p2 = new Project() { ProjectId = Guid.NewGuid(), ProjectName = "Math" };
-                // Add to the database.
-                _dbContext.Projects.Add(p1);
-                _dbContext.Projects.Add(p2);
+
+                // Read the initial projects from the configuration file.
+                var init_project_lst = _configuration.GetSection("InitData:Projects").Get<List<Project>>();
+                // Add to initial data to the database.
+                _dbContext.Projects.AddRange(init_project_lst);
                 _dbContext.SaveChanges();
                 return true;
             }
@@ -197,46 +195,47 @@ namespace StudentProject.Models
         /// </summary>
         private void InitializeDatabaseData()
         {
-            // Create the new student data.
-            Student s1 = new Student() { StudentId = Guid.NewGuid(), FirstName = "Demo", LastName = "Example" };
-            Student s2 = new Student() { StudentId = Guid.NewGuid(), FirstName = "Anders", LastName = "Andersson" };
-            Student s3 = new Student() { StudentId = Guid.NewGuid(), FirstName = "Steven", LastName = "Job" };
-            Student s4 = new Student() { StudentId = Guid.NewGuid(), FirstName = "Lars", LastName = "Nillson" };
+            var init_student_lst = _configuration.GetSection("InitData:Students").Get<List<Student>>();
+            var init_project_lst = _configuration.GetSection("InitData:Projects").Get<List<Project>>();
+            var init_group_lst = _configuration.GetSection("InitData:Groups").Get<List<Group>>();
 
-            // Create the new group data (for English Project);
-            Group g1 = new Group() { GroupId = Guid.NewGuid(), GroupName = "EnglishIsBetter" };
-            Group g2 = new Group() { GroupId = Guid.NewGuid(), GroupName = "EnglishIsAcceptable" };
-            Group g3 = new Group() { GroupId = Guid.NewGuid(), GroupName = "EnglishIsCrazy" };
+            _dbContext.AddRange(new StudentGroup { Student = init_student_lst[0], Group = init_group_lst[0] });
+            _dbContext.AddRange(new StudentGroup { Student = init_student_lst[1], Group = init_group_lst[1] });
+            _dbContext.AddRange(new StudentGroup { Student = init_student_lst[2], Group = init_group_lst[2] });
+            _dbContext.AddRange(new StudentGroup { Student = init_student_lst[0], Group = init_group_lst[3] });
+            _dbContext.AddRange(new StudentGroup { Student = init_student_lst[1], Group = init_group_lst[4] });
+            _dbContext.AddRange(new StudentGroup { Student = init_student_lst[3], Group = init_group_lst[5] });
 
-            // Create the new group data (for Math Project);
-            Group g4 = new Group() { GroupId = Guid.NewGuid(), GroupName = "MathIsBetter" };
-            Group g5 = new Group() { GroupId = Guid.NewGuid(), GroupName = "MathIsAcceptable" };
-            Group g6 = new Group() { GroupId = Guid.NewGuid(), GroupName = "MathIsCrazy" };
+            //// Add the Groups to each Project.
+            init_project_lst[0].Groups.Add(init_group_lst[0]);
+            init_project_lst[0].Groups.Add(init_group_lst[1]);
+            init_project_lst[0].Groups.Add(init_group_lst[2]);
+            init_project_lst[1].Groups.Add(init_group_lst[3]);
+            init_project_lst[1].Groups.Add(init_group_lst[4]);
+            init_project_lst[1].Groups.Add(init_group_lst[5]);
 
-            _dbContext.AddRange(new StudentGroup { Student = s1, Group = g1 });
-            _dbContext.AddRange(new StudentGroup { Student = s2, Group = g2 });
-            _dbContext.AddRange(new StudentGroup { Student = s3, Group = g3 });
-            _dbContext.AddRange(new StudentGroup { Student = s1, Group = g4 });
-            _dbContext.AddRange(new StudentGroup { Student = s3, Group = g5 });
-            _dbContext.AddRange(new StudentGroup { Student = s4, Group = g6 });
-
-            // Create the Project Data.
-            Project p1 = new Project() { ProjectId = Guid.NewGuid(), ProjectName = "English" };
-            Project p2 = new Project() { ProjectId = Guid.NewGuid(), ProjectName = "Math" };
-
-            // Add the Groups to each Project.
-            p1.Groups.Add(g1);
-            p1.Groups.Add(g2);
-            p1.Groups.Add(g3);
-
-            p2.Groups.Add(g4);
-            p2.Groups.Add(g5);
-            p2.Groups.Add(g6);
-
-            // Add to the database, and then save the changes.
-            _dbContext.Projects.Add(p1);
-            _dbContext.Projects.Add(p2);
+            // Add everything to the database, and then save the changes.
+            _dbContext.Projects.AddRange(init_project_lst);
             _dbContext.SaveChangesAsync();
+        }
+
+        /// <summary>
+        /// Load prepared data for the test purpose. With 2 projects and 6 groups, each project has 3 groups, and each
+        /// group has 1 student.
+        /// </summary>
+        /// <returns>True if sucessful, otherwise return false.</returns>
+        public bool LoadPreparedData()
+        {
+            try
+            {
+                ClearExistingDatabaseData();
+                InitializeDatabaseData();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
         }
     }
 }
