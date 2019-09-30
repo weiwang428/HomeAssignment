@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using Newtonsoft.Json;
 
 namespace StudentProject.Models
 {
@@ -19,6 +20,7 @@ namespace StudentProject.Models
         public string GroupName { get; set; }
 
         // Each group may have multiple students
+        [JsonProperty("Students")]
         public ICollection<StudentGroup> StudentGroups { get;}
     }
 }

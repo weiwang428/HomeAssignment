@@ -31,14 +31,16 @@ namespace StudentProject.Controllers
                 return Content("Problem with initialization");
         }
 
+        // GET /Project/List
         [HttpGet("List")]
+        [Produces("application/json")]
         public ActionResult List()
         {
             return Ok(_stuProjRepo.ListProjects());
         }
 
         // POST /project/AddStudentToGroup?groupId={Group_Id}&studentId={Student_Id}
-        [HttpGet("AddStudentToGroup")]
+        [HttpPost("AddStudentToGroup")]
         public ContentResult AddStudentToGroup(string groupId, string studentId)
         {
             if (_stuProjRepo.AddStudentToGroup(new Guid(groupId), new Guid(studentId)))
@@ -47,7 +49,6 @@ namespace StudentProject.Controllers
                 return Content("False");
 
         }
-
 
         // POST /project/Creategroup?projectid={Project_Id}&groupname={Group_Name}
         [HttpPost("Creategroup")]

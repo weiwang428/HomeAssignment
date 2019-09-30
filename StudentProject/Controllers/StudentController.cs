@@ -32,20 +32,20 @@ namespace StudentProject.Controllers
                 return Content("Problem with initialization");
         }
 
+        // GET /Student/List
         [HttpGet("List")]
+        [Produces("application/json")]
         public ActionResult List()
         {
             return Ok(_stuProjRepo.ListStudents());
         }
 
+        // GET /Student/GetProjects?Id={Student_Id}
         [HttpGet("GetProjects")]
+        [Produces("application/json")]
         public ActionResult GetProjects(string Id)
         {
             return Ok(_stuProjRepo.GetProjects(new Guid(Id)));
         }
-
-
-
-
     }
 }
