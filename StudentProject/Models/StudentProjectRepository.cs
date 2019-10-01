@@ -205,13 +205,17 @@ namespace StudentProject.Models
         /// </summary>
         private bool ClearExistingDatabaseData()
         {
-            if (_dbContext.Database.EnsureDeleted() && _dbContext.Database.EnsureCreated())
+            try
             {
+                _dbContext.Database.EnsureDeleted();
+                _dbContext.Database.EnsureCreated();
                 _dbContext.SaveChanges();
                 return true;
             }
-            else
+            catch (Exception _ex)
+            {
                 return false;
+            }
         }
 
         /// <summary>
@@ -256,7 +260,7 @@ namespace StudentProject.Models
                 InitializeDatabaseData();
                 return true;
             }
-            catch (Exception)
+            catch (Exception _ex)
             {
                 return false;
             }

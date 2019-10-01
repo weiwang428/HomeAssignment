@@ -152,5 +152,61 @@ namespace StudentProject.Test
             // Each project should contain only 1 group with the matched student.
             lst.ForEach(p => Assert.Equal(1, p.Groups.Count));
         }
+
+        [Fact]
+        public async Task GetProjectsShouldNotOKWithAInvalidStudentId()
+        {
+            // Act
+            var response = await Client.GetAsync($"/Student/LoadPreparedData");
+
+            var val = response.Content.ReadAsStringAsync();
+
+            // Assert the response status
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+            // Assert the response content value.
+            Assert.Equal("Successfully load the prepared data.", val.Result);
+
+            // Invalid Student_Id
+            string Student_Id = "e0c0cb8d-bed6-4806-92fc-1ef2c261e4";
+
+            // Act
+            response = await Client.GetAsync($"/Student/GetProjects?Id={Student_Id}");
+
+            var val2 = await response.Content.ReadAsStringAsync();
+
+            Assert.Contains("Guid should contain 32 digits with 4 dashes (xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx)", val2);
+        }
+
+        [Fact]
+        public async Task GetProjectsShouldReturnEmptyListWithNotExistStudentId()
+        {
+            // Act
+            var response = await Client.GetAsync($"/Student/LoadPreparedData");
+
+            var val = response.Content.ReadAsStringAsync();
+
+            // Assert the response status
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+            // Assert the response content value.
+            Assert.Equal("Successfully load the prepared data.", val.Result);
+
+            // This is just a student_Id which matches no project.
+            string Student_Id = "e0c0cb8d-bed6-4806-92fc-1ef2c261e045";
+
+            // Act
+            response = await Client.GetAsync($"/Student/GetProjects?Id={Student_Id}");
+
+            var val2 = await response.Content.ReadAsStringAsync();
+
+
+            var jsonSerializerSettings = new JsonSerializerSettings();
+            jsonSerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+            var lst = JsonConvert.DeserializeObject<List<Project>>(val2, jsonSerializerSettings);
+
+            // It has to be an empty list.
+            Assert.Empty(lst);
+        }
     }
 }
