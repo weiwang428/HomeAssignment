@@ -191,7 +191,7 @@ namespace StudentProject.Models
                                 .Where(g => g.GroupName == groupName)
                                 .FirstOrDefault();
             if (gro != null)
-                return "Creation Fail, duplicate project name.";
+                return "Creation Fail, duplicate group name in this project.";
             // Create a new GUID for group.
             Group newGroup = new Group() { GroupId = new Guid(), GroupName = groupName };
             pro.Groups.Add(newGroup);
