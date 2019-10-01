@@ -212,7 +212,7 @@ namespace StudentProject.Models
                 _dbContext.SaveChanges();
                 return true;
             }
-            catch (Exception _ex)
+            catch (Exception)
             {
                 return false;
             }
@@ -260,7 +260,7 @@ namespace StudentProject.Models
                 InitializeDatabaseData();
                 return true;
             }
-            catch (Exception _ex)
+            catch (Exception)
             {
                 return false;
             }
